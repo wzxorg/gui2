@@ -1,0 +1,22 @@
+﻿  main.cpp
+main.obj : error LNK2005: "public: __thiscall window_::window_(void)" (??0window_@@QAE@XZ) 已经在 func.obj 中定义
+main.obj : error LNK2005: "int __cdecl LoadFile(struct HWND__ *,char *)" (?LoadFile@@YAHPAUHWND__@@PAD@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "int __cdecl SaveFile(struct HWND__ *,char *)" (?SaveFile@@YAHPAUHWND__@@PAD@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "void __cdecl alert(char const * const,char const * const)" (?alert@@YAXQBD0@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall window_::alert(char const * const,char const * const)" (?alert@window_@@QAEXQBD0@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall window_::callback_(long (__stdcall*)(struct HWND__ *,unsigned int,unsigned int,long))" (?callback_@window_@@QAEXP6GJPAUHWND__@@IIJ@Z@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "bool __cdecl confirm(char const * const,char const * const)" (?confirm@@YA_NQBD0@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: bool __thiscall window_::confirm(char const * const,char const * const)" (?confirm@window_@@QAE_NQBD0@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall Text_::create(char const * const,unsigned int,struct HWND__ *)" (?create@Text_@@QAEXQBDIPAUHWND__@@@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: bool __thiscall window_::create(int,int)" (?create@window_@@QAE_NHH@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: struct HWND__ * __thiscall BasicControl::getHwnd(void)" (?getHwnd@BasicControl@@QAEPAUHWND__@@XZ) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: int __thiscall BasicControl::getId(void)" (?getId@BasicControl@@QAEHXZ) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: char * __thiscall window_::getWinText(void)" (?getWinText@window_@@QAEPADXZ) 已经在 func.obj 中定义
+main.obj : error LNK2005: "char * __cdecl gfn1(void)" (?gfn1@@YAPADXZ) 已经在 func.obj 中定义
+main.obj : error LNK2005: "char * __cdecl gfn1_child(struct HWND__ *)" (?gfn1_child@@YAPADPAUHWND__@@@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall window_::histance_(struct HINSTANCE__ *)" (?histance_@window_@@QAEXPAUHINSTANCE__@@@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall BasicControl::setLocation(int,int,int,int)" (?setLocation@BasicControl@@QAEXHHHH@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "public: void __thiscall window_::setWinText(char const * const)" (?setWinText@window_@@QAEXQBD@Z) 已经在 func.obj 中定义
+main.obj : error LNK2005: "protected: void __thiscall window_::sett(char const * const,struct HWND__ *)" (?sett@window_@@IAEXQBDPAUHWND__@@@Z) 已经在 func.obj 中定义
+MSVCRTD.lib(exe_main.obj) : error LNK2019: 无法解析的外部符号 _main，该符号在函数 "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ) 中被引用
+B:\programing\cpp\成品\gui2\gui2\Debug\gui2.exe : fatal error LNK1120: 1 个无法解析的外部命令

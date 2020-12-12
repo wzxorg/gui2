@@ -1,0 +1,125 @@
+
+class CallBackWindow :public window_{
+public:
+	CallBackWindow();
+	bool create(int width, int height);
+	static LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_contextMenu(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_paint(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_char(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	static void wm_keyDown(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
+	
+	
+};
+CallBackWindow* PointerToCallBackWindow = NULL;
+
+CallBackWindow::CallBackWindow(/*WNDPROC wndproc , HINSTANCE handle*/) {
+	//构造函数
+	PointerToCallBackWindow = this;
+	memset(&this->wc, 0, sizeof(this->wc));
+	this->wc.cbSize = sizeof(WNDCLASSEX);
+	//this->wc.lpfnWndProc = WndProc; /* This is where we will send messages to		我们将向这里发送信息 */
+	//this->wc.hInstance = hInstance;
+	this->wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+
+	/* White, COLOR_WINDOW is just a #define for a system color, try Ctrl+Clicking it
+	白色，彩色窗口只是一个系统颜色的定义，请尝试按住Ctrl键并单击它  */
+	this->wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	this->wc.lpszClassName = "WindowClass_";
+	this->wc.hIcon = LoadIcon(NULL, IDI_APPLICATION); /* Load a standard icon	加载标准图标 */
+	this->wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION); /* use the name "A" to use the project icon 使用名称“A”来使用项目图标 */
+
+
+
+}
+void CallBackWindow::wm_char(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_keyDown(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+	//alert("123", "");
+}
+void CallBackWindow::wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_contextMenu(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+void CallBackWindow::wm_paint(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+
+}
+LRESULT CALLBACK CallBackWindow::WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+	
+	switch (Message) {
+	case WM_DESTROY: {
+		PostQuitMessage(0);break;
+	}
+	case WM_SIZE: { //必须放在  case WM_CREATE 的前面
+		if (wParam != SIZE_MINIMIZED) {
+			wm_size(hwnd, Message, wParam, lParam);
+		}
+		break;
+	}
+	case WM_CREATE: {//创建窗口时响应
+		wm_create(hwnd, Message, wParam, lParam);break;
+	}
+	case WM_CONTEXTMENU:		//右击屏幕时，弹出菜单
+	{
+		wm_contextMenu(hwnd, Message, wParam, lParam);break;
+	}
+	case WM_PAINT: {
+		wm_paint(hwnd, Message, wParam, lParam);break;
+	}
+	case WM_COMMAND: {//相应事件，所有的按钮响应全在这。
+		wm_command(hwnd, Message, wParam, lParam);break;
+	}
+	case WM_KEYDOWN: {//响应键盘按下
+		wm_keyDown(hwnd, Message, wParam, lParam);break;
+	}
+	case WM_CHAR: {
+		wm_char(hwnd, Message, wParam, lParam);
+		break;
+	}
+	default:
+		return DefWindowProc(hwnd, Message, wParam, lParam);
+	}
+	return 0;
+}
+bool CallBackWindow::create(int width, int height) {
+	PointerToCallBackWindow = this;
+	this->wc.lpfnWndProc = WndProc;
+	if (!RegisterClassEx(&wc)) {
+		MessageBox(NULL, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+		return 0;
+	}
+
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, "WindowClass_", caption, WS_VISIBLE | WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, /* x */
+		CW_USEDEFAULT, /* y */
+		width, /* width */
+		height, /* height */
+		NULL, NULL, this->wc.hInstance, NULL);
+
+	if (hwnd == NULL) {
+		MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+		return 0;
+	}
+	while (GetMessage(&msg, NULL, 0, 0) > 0) { /* If no error is received... 如果没有收到错误  */
+		TranslateMessage(&msg); /* Translate key codes to chars if present 	将密钥代码转换为字符（如果存在）*/
+		DispatchMessage(&msg); /* Send it to WndProc 发送给WndProc。*/
+	}
+	return msg.wParam;
+}
+

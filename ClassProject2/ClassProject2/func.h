@@ -168,6 +168,7 @@ public:
 	bool confirm(const char str[], const char captain[]);
 	void setText(const char str[]);
 	char* getText();
+	
 protected:
 	void sett(const char str[], HWND hedit);
 };
@@ -244,7 +245,6 @@ char* Window_::getText() {
 	GetWindowText(this->hwnd, pszText, dwTextLength + 1);
 	return (char*)pszText;
 }
-
 
 class BasicControl {
 public:
@@ -615,3 +615,5 @@ bool set_Win_Text(HWND hwnd, const char str[]) {
 }
 
 int getVersionInt() { return HEADER_FILE_VERSION; }
+
+

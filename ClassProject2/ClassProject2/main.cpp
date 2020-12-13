@@ -1,5 +1,5 @@
 #include "func.h"
-
+#include "resource.h"
 Window_ win1;
 TextBox t1;
 BorderText t2;
@@ -40,7 +40,11 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	b1[4].create("4", 2004, hwnd);
 	b1[5].create("5", 2005, hwnd);
 	b1[6].create("6", 2006, hwnd);
-	l1.create("", 1002, hwnd);
+	l1.create("123", 1002, hwnd);
+	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
+	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
+	
 }
 void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	
@@ -48,7 +52,7 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	b1[0].setLocation(110, 0, 50, 30);
 	b1[1].setLocation(200,0,50,30);
 	b1[2].setLocation(250,0,50,30);
-	l1.setLocation(60, 0, 100, 50);
+	l1.setLocation(0, 60, 100, 50);
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch (wParam)
@@ -131,9 +135,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 	}
 	return 0;
 }
-int main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	win1.histance_(hInstance);
 	win1.callback_(WndProc);
+	//win1.wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	//win1.wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	//win1.wc.style = CS_HREDRAW | CS_VREDRAW;
 	///alert("", "");
 	win1.create_wind(640, 480);
 	return 0;

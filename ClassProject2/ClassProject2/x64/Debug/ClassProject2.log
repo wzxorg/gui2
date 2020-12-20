@@ -1,5 +1,14 @@
 ﻿  main.cpp
-b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(297): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
-b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(308): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
-b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(321): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(319): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(330): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(343): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(361): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(372): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(391): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(408): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(439): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(509): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(560): warning C4312: “类型强制转换”: 从“unsigned int”转换到更大的“HMENU”
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(584): warning C4311: “类型强制转换”: 从“HMENU”到“UINT”的指针截断
+b:\programing\cpp\成品\gui2\classproject2\classproject2\func.h(584): warning C4302: “类型强制转换”: 从“HMENU”到“UINT”截断
   ClassProject2.vcxproj -> B:\programing\cpp\成品\gui2\ClassProject2\x64\Debug\ClassProject2.exe

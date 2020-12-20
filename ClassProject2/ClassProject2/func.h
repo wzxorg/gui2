@@ -384,7 +384,8 @@ public:
 };
 
 
-class BorderLabel_ : public Label {
+class BorderLabel : public Label {
+public:
 	void create(const char captain[], unsigned int Handle, HWND hparent) {
 		hwnd_parent = hparent;
 		id = Handle;
@@ -401,7 +402,8 @@ class BorderLabel_ : public Label {
 	}
 };
 
-class CenterLabel_ :public Label {
+class CenterLabel :public Label {
+public:
 	void create(const char captain[], unsigned int Handle, HWND hparent) {
 		hwnd_parent = hparent;
 		id = Handle;
@@ -415,6 +417,24 @@ class CenterLabel_ :public Label {
 			GetModuleHandle(NULL),
 			NULL);
 		SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	}
+};
+
+class BitmapLabel :public Label {
+public:
+	void create(const char captain[], unsigned int Handle, HWND hparent) {
+		hwnd_parent = hparent;
+		id = Handle;
+		hwnd = CreateWindow(
+			"STATIC",
+			captain,
+			WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE| SS_BITMAP| SS_ICON,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			hparent,
+			(HMENU)Handle,
+			GetModuleHandle(NULL),
+			NULL);
+		//SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
 	}
 };
 
@@ -616,4 +636,13 @@ bool set_Win_Text(HWND hwnd, const char str[]) {
 
 int getVersionInt() { return HEADER_FILE_VERSION; }
 
+bool setWinIcon(HINSTANCE hins ,HWND hParent ,LPSTR name) {
+	HICON hIcon = LoadIcon(hins, name);
+	return SendMessage(hParent, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+}
 
+bool setImage(HINSTANCE hins, HWND hwnd,LPSTR name) {
+	HBITMAP	hBmp;
+	hBmp = LoadBitmap(hins,name);
+	return SendMessage(hwnd, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBmp);
+}

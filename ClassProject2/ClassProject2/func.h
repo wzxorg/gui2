@@ -646,3 +646,7 @@ bool setImage(HINSTANCE hins, HWND hwnd,LPSTR name) {
 	hBmp = LoadBitmap(hins,name);
 	return SendMessage(hwnd, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBmp);
 }
+
+bool setDefFont(HWND hwnd) {
+	return SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+}

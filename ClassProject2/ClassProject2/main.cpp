@@ -31,6 +31,7 @@ void wm_keyDown(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	strcat(dest, txt);
 	strcat(dest, "+");
 	win1.setText(dest);
+	
 }
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	//alert("", "");

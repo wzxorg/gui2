@@ -18,6 +18,10 @@ using namespace std;
 #define text_char					char*
 #define const_text_char				const char*
 
+#define getFileName_char			gfn1
+#define childGetFileNmae_char		gfn1_child
+#define getFileNameSave				gfn_save
+
 static char* U2G(const char* utf8) {
 	int len = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
 	wchar_t* wstr = new wchar_t[len + 1];
@@ -90,7 +94,29 @@ char* gfn1_child(HWND hwnd) {
 	strcpy(str, szFileName);
 	return str;
 }
+char* gfn_save(HWND hwnd) {
+	OPENFILENAME ofn;
 
+	char szFileName[MAX_PATH];
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	szFileName[0] = 0;
+
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hwnd;
+	ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0";
+	ofn.lpstrFile = szFileName; //文件名将被保存在此变量中 
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrDefExt = "txt";
+	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+
+	ofn.lpstrTitle = "另存为";
+	//定义完了对话框
+	GetOpenFileName(&ofn);
+	char* str = new char[MAX_PATH];
+	strcpy(str, szFileName);
+	return str;
+}
 BOOL LoadFile(HWND hEdit, LPSTR pszFileName) {
 	HANDLE hFile;
 	BOOL bSuccess = FALSE;
@@ -444,7 +470,7 @@ public:
 	void create(unsigned int Handle, HWND hparent);
 	void add(const char str[]);
 	char* getText(int size);
-	int getindex();
+	int getIndex();
 	void removeItem(int index);
 	void insertItem(int index, const char str[]);
 	void setItemText(int index, const char str[]);
@@ -467,16 +493,16 @@ void ListBox::add(const char str[]) {
 
 }
 char* ListBox::getText(int size) {
-	if (size <= 0)return (CHAR*)"";
+	if (size <= 0)return false;
 	int lbItem = (int)SendMessage(this->hwnd, LB_GETCURSEL, 0, 0);
 	char* str = new char[size];
-
-	if (lbItem != -1)
+	ZeroMemory(str, size);
+	if (lbItem > -1)
 		SendMessage(this->hwnd, LB_GETTEXT, lbItem, (LPARAM)str);
-	else strcpy(str, "");
+	else return false;
 	return str;
 }
-int ListBox::getindex() {
+int ListBox::getIndex() {
 	int lbItem = (int)SendMessage(this->hwnd, LB_GETCURSEL, 0, 0);
 	return lbItem;
 }
@@ -491,12 +517,12 @@ void ListBox::setItemText(int index, const char str[]) {
 	this->insertItem(index, str);
 }
 char* ListBox::getItemText(int index, int size) {
-	if (size <= 0)return (CHAR*)"";
+	if (size <= 0)return false;
 	char* str = new char[size];
-
-	if (index != -1)
+	ZeroMemory(str, size);
+	if (index > -1)
 		SendMessage(this->hwnd, LB_GETTEXT, index, (LPARAM)str);
-	else strcpy(str, "");
+	else return false;
 	return str;
 }
 void ListBox::clean() {
@@ -512,7 +538,7 @@ public:
 	void create(unsigned int Handle, HWND hparent);
 	void add(const char str[]);
 	char* getText(int size);
-	int getindex();
+	int getIndex();
 	void removeItem(int index);
 	void insertItem(int index, const char str[]);
 	void setItemText(int index, const char str[]);
@@ -541,17 +567,17 @@ char* ComboBox::getText(int size) {
 	GetWindowText(this->hwnd, pszText, dwTextLength + 1);
 	return (char*)pszText;
 }
-int ComboBox::getindex() {
+int ComboBox::getIndex() {
 	int lbItem = (int)SendMessage(this->hwnd, CB_GETCURSEL, 0, 0);
 	return lbItem;
 }
 char* ComboBox::getItemText(int index, int size) {
-	if (size <= 0)return (CHAR*)"";
+	if (size <= 0)return false;
 	char* str = new char[size];
-
-	if (index != -1)
+	ZeroMemory(str, size);
+	if (index > -1)
 		SendMessage(this->hwnd, CB_GETLBTEXT, index, (LPARAM)str);
-	else strcpy(str, "");
+	else return false;
 	return str;
 }
 void ComboBox::removeItem(int index) {
@@ -572,7 +598,7 @@ int ComboBox::getCount() {
 }
 
 
-class ComboBoxList_ : public ComboBox {
+class ComboBoxList : public ComboBox {
 public:
 	void create(unsigned int Handle, HWND hparent) {
 		hwnd_parent = hparent;
@@ -647,6 +673,66 @@ bool setImage(HINSTANCE hins, HWND hwnd,LPSTR name) {
 	return SendMessage(hwnd, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBmp);
 }
 
+//IO
+
 bool setDefFont(HWND hwnd) {
 	return SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+}
+
+LPSTR CHAR_ToLPSTR(const char* str) {
+	return (LPSTR)str;
+}
+char* LPSTRtoCHAR(LPSTR str) {
+	return (CHAR*)str;
+}
+
+char* readFile_char(LPSTR pszFileName) {
+	HANDLE hFile;
+	BOOL bSuccess = FALSE;
+	char * filetext;
+	filetext = (CHAR *)"";
+	hFile = CreateFile(pszFileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, 0);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		DWORD dwFileSize;
+		dwFileSize = GetFileSize(hFile, NULL);
+		if (dwFileSize != 0xFFFFFFFF) {
+			LPSTR pszFileText;
+			pszFileText = (LPSTR)GlobalAlloc(GPTR, dwFileSize + 1);
+			if (pszFileText != NULL) {
+				DWORD dwRead;
+				if (ReadFile(hFile, pszFileText, dwFileSize, &dwRead, NULL)) {
+					pszFileText[dwFileSize] = 0; // Null terminator
+					filetext = pszFileText;
+					bSuccess = true;
+				}
+				GlobalFree(pszFileText);
+			}
+		}
+		CloseHandle(hFile);
+	}
+	if (bSuccess)return filetext;
+	return 0;
+}
+
+BOOL SaveFile_char(char* fileText, LPSTR pszFileName) {
+	HANDLE hFile;
+	BOOL bSuccess = FALSE;
+
+	hFile = CreateFile(pszFileName, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		DWORD dwTextLength;
+		dwTextLength = strlen(fileText);
+		if (dwTextLength > 0) {
+			LPSTR pszText=CHAR_ToLPSTR(fileText);
+			if (pszText != NULL) {
+				DWORD dwWritten;
+				if (WriteFile(hFile, pszText, dwTextLength, &dwWritten, NULL))
+					bSuccess = TRUE;
+
+				GlobalFree(pszText);
+			}
+		}
+		CloseHandle(hFile);
+	}
+	return bSuccess;
 }

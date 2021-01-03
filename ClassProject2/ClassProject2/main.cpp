@@ -8,6 +8,10 @@ Button b1[10];
 Label l1;
 RtMenu m1;
 RtMenu m2;
+ListBox list1;
+Topmenu top1;
+childMenu cm1;
+childMenu cm2;
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -47,6 +51,14 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	m1.addItem(3001, "Change Icon I");
 	m1.addItem(3002,"Reset the icon");
 	m1.addItem(3003, "change image");
+	
+	cm1.create(top1.h_menu, "ListBox");
+	cm1.addItem(3004,"Add 123");
+	cm1.addItem(3005, "Add");
+	cm2.create(top1.h_menu,"IO");
+	cm2.addItem(3006, "SaveFile");
+	top1.show(hwnd);
+	list1.create(4001,hwnd);
 	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
 	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
@@ -58,7 +70,11 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	b1[0].setLocation(110, 0, 50, 30);
 	b1[1].setLocation(200,0,50,30);
 	b1[2].setLocation(250,0,50,30);
+	b1[3].setLocation(300, 0, 50, 30);
 	l1.setLocation(0, 60, 100, 100);
+	list1.setLocation(0, 200, 200, 200);
+	b1[4].setLocation(200, 200, 50, 30);
+	
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch (wParam)
@@ -77,6 +93,10 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		l1.setText(t1.getText());
 		break;
 	}
+	case 2003: {
+		t1.setText(readFile_char(CHAR_ToLPSTR(childGetFileNmae_char(hwnd))));
+		break;
+	}
 	case 3001: {
 		setWinIcon(NULL, hwnd, MAKEINTRESOURCE(IDI_ICON1));
 		break;
@@ -87,7 +107,25 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	}
 	case 3003: {
 		setImage(win1.his, b1[0].getHwnd(), MAKEINTRESOURCE(IDB_BITMAP1));
-		
+		break;
+	}
+	case 2004: {
+		t1.setText(list1.getItemText(list1.getIndex(),260));
+		break;
+	}
+	case 3004: {
+		list1.add("123");
+		break;
+	}
+	case 3005: {
+		list1.add(t1.getText());
+		break;
+	}
+	case 3006: {
+		//alert(gfn_save(hwnd),"");
+		//alert(gfn1_child(hwnd), "");
+		SaveFile_char(t1.getText(), gfn_save(hwnd));
+		break;
 	}
 	default: {
 

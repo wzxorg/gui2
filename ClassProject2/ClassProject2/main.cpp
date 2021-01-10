@@ -12,6 +12,8 @@ ListBox list1;
 Topmenu top1;
 childMenu cm1;
 childMenu cm2;
+TableBox ta1;
+childMenu cm3;
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -57,8 +59,22 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	cm1.addItem(3005, "Add");
 	cm2.create(top1.h_menu,"IO");
 	cm2.addItem(3006, "SaveFile");
+	cm3.create(top1.h_menu, "Tablebox");
+	cm3.addItem(3007,"Add Colume");
+	cm3.addItem(3008,"Add Item");
+	cm3.addItem(3009, "Get Index");
+	cm3.addItem(3010, "Clear");
+	cm3.addItem(3011, "Count");
+	cm3.addItem(3012, "Delete");
+	cm3.addItem(3013, "getRow");
+	cm3.addItem(3014, "setText");
 	top1.show(hwnd);
+
+
 	list1.create(4001,hwnd);
+
+	ta1.create(1003, hwnd);
+
 	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
 	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
@@ -74,6 +90,7 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	l1.setLocation(0, 60, 100, 100);
 	list1.setLocation(0, 200, 200, 200);
 	b1[4].setLocation(200, 200, 50, 30);
+	ta1.setLocation(300,60,250,150);
 	
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
@@ -127,6 +144,51 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		SaveFile_char(t1.getText(), gfn_save(hwnd));
 		break;
 	}
+	case 3007: {
+		char* str = t1.getText();
+		UI_LvPop cols;
+		cols.cols[0].value = t1.getText();
+		cols.cols[0].size = strlen(str) * 10;
+		cols.cols[1].value = "Name";
+		cols.cols[1].size = 60;
+		cols.cols[2].value = "Class";
+		cols.cols[2].size = 70;
+		ta1.setColume(cols,3);
+		break;
+	}
+	case 3008: {
+		UI_Lvitem item;
+		item.subItem[0].value = "0";
+		item.subItem[1].value = "Adolf";
+		item.subItem[2].value = "Germany";
+		ta1.addItem(item, 3);
+		break;
+	}
+	case 3009: {
+		cout << ta1.getIndex();
+		break;
+	}
+	case 3010: {
+		ta1.clear();
+		break;
+	}
+	case 3011: {
+		cout << ta1.getCount();
+		break;
+	}
+	case 3012: {
+		ta1.removeItem(ta1.getIndex());
+		break;
+	}
+	case 3013: {
+		cout << ta1.getItemText(ta1.getIndex(), 0);
+		cout << ta1.getItemText(ta1.getIndex(), 1);
+		cout << ta1.getItemText(ta1.getIndex(), 2);
+	}
+	case 3014: {
+		ta1.setItemText(ta1.getIndex(), 1, t1.getText());
+		break;
+	}
 	default: {
 
 		break;
@@ -172,7 +234,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 	}
 	return 0;
 }
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+int /*WINAPI WinMain */main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
+	InitCommonControls();
 	win1.histance_(hInstance);
 	win1.callback_(WndProc);
 	win1.wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));

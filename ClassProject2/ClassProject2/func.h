@@ -277,6 +277,7 @@ public:
 	HWND getHwnd();
 	unsigned int getId();
 	HWND getHwndParent();
+	void setHWND(HWND hWnd);
 	//void create(unsigned int Handle, HWND hparent);
 	void setLocation(int x, int y, int width, int heignt);
 	char* getText();
@@ -310,6 +311,9 @@ void BasicControl::setText(const char* str) {
 HWND BasicControl::getHwndParent() {
 	return this->hwnd_parent;
 }
+void BasicControl::setHWND(HWND hWnd) {
+	hwnd = hWnd;
+}
 
 class ListBasicControl {
 public:
@@ -317,6 +321,7 @@ public:
 	unsigned int getId();
 	HWND getHwndParent();
 	void setLocation(int x, int y, int width, int heignt);
+	void setHWND(HWND hWnd);
 protected:
 	HWND hwnd;
 	unsigned int id;
@@ -333,6 +338,9 @@ unsigned int ListBasicControl::getId() {
 }
 HWND ListBasicControl::getHwndParent() {
 	return this->hwnd_parent;
+}
+void ListBasicControl::setHWND(HWND hWnd) {
+	hwnd = hWnd;
 }
 
 
@@ -735,4 +743,117 @@ BOOL SaveFile_char(char* fileText, LPSTR pszFileName) {
 		CloseHandle(hFile);
 	}
 	return bSuccess;
+}
+
+#include <commctrl.h>
+#include <stdio.h>
+#pragma comment(lib, "comctl32.lib")
+#define TableBoxMaxSting 4100//获取tablebox中字符串的最大长度4and1/256 kBytes，必要时可修改
+
+
+class UI_Lvsubitem {
+public:
+	UI_Lvsubitem();
+	const char* value;
+
+};
+UI_Lvsubitem::UI_Lvsubitem() {
+	this->value = "";
+}
+
+class UI_LvCol {
+public:
+	UI_LvCol();
+	const char* value;
+	int size;
+
+};
+UI_LvCol::UI_LvCol() {
+	this->value = "";
+	size = 0;
+}
+
+
+class UI_LvPop {
+public:
+	UI_LvCol cols[128];
+};
+class UI_Lvitem {
+public:
+	UI_Lvsubitem  subItem[128];
+};
+class TableBox : public  ListBasicControl {
+public:
+	void create(unsigned int Command,HWND hwnd);
+	void setColume(UI_LvPop cols, int numOfCol/*列的数量*/);
+	void addItem(UI_Lvitem item, int numOfCol/*列的数量*/);
+	int getIndex();
+	void clear();
+	int getCount();
+	bool removeItem(int index);
+	char* getItemText(int index, int col);
+	bool setItemText(int index, int col,const char* str);
+};
+void TableBox::create(unsigned int Handle, HWND hparent) {
+	InitCommonControls();
+	this->id = Handle;
+	hwnd = CreateWindowEx(NULL,"SysListView32",0, LVS_REPORT |LVS_EX_GRIDLINES| LVS_SHOWSELALWAYS| LVS_EX_FULLROWSELECT |WS_CHILD | WS_VISIBLE | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+
+	ShowWindow(hwnd, SW_SHOW);
+	SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	this->hwnd_parent = hparent;
+	//Refresh();
+}
+void TableBox::setColume(UI_LvPop cols, int numOfCol/*列的数量*/) {
+
+	LV_COLUMN lvc;
+	lvc.mask = LVCF_TEXT | LVCF_WIDTH;
+	for (int i = 0; i < numOfCol;i++) {
+		lvc.pszText = (LPSTR)cols.cols[i].value;
+		lvc.cx = cols.cols[i].size;
+		SendMessage(this->hwnd, LVM_INSERTCOLUMN, i, (long)&lvc);
+	}
+}
+void TableBox::addItem(UI_Lvitem item, int numOfCol/*列的数量*/) {
+	LVITEM p1 = { 0 };
+	p1.mask = LVIF_TEXT | LVIF_STATE;
+	p1.state = INDEXTOSTATEIMAGEMASK(1);
+
+	p1.pszText = (LPSTR)item.subItem[0].value;
+	
+	SendMessageA(hwnd, LVM_INSERTITEM, 0, (LPARAM)&p1);
+
+	for (int i = 1; i < numOfCol; i++) {
+		p1.iSubItem = i;
+		p1.pszText = (LPSTR)item.subItem[i].value;
+		SendMessageA(hwnd, LVM_SETITEMTEXT, 0, (LPARAM)&p1);
+	}
+}
+int TableBox::getIndex() {
+	return SendMessageA(hwnd, LVM_GETSELECTIONMARK, 0, 0);
+
+}
+void TableBox::clear() {
+	SendMessageA(hwnd, LVM_DELETEALLITEMS, 0, 0);
+}
+int TableBox::getCount() {
+	return SendMessageA(hwnd, LVM_GETITEMCOUNT, 0, 0);
+}
+bool TableBox::removeItem(int index) {
+	return SendMessageA(hwnd, LVM_DELETEITEM, index, 0);
+}
+char* TableBox::getItemText(int index, int col) {
+	LPSTR lpstr=(LPSTR)"";
+	char str[TableBoxMaxSting];
+	ListView_GetItemText(this->hwnd, index, col, (LPSTR)str, TableBoxMaxSting);
+	return str;
+}
+bool TableBox::setItemText(int index, int col,const char* str) {
+	LVITEM p1 = { 0 };
+	p1.mask = LVIF_TEXT | LVIF_STATE;
+	p1.state = INDEXTOSTATEIMAGEMASK(1);
+	p1.iSubItem = col;
+	p1.pszText = (LPSTR)str;
+	return SendMessageA(hwnd, LVM_SETITEMTEXT,index, (LPARAM)&p1);
 }

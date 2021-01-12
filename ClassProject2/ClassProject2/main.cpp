@@ -68,6 +68,9 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	cm3.addItem(3012, "Delete");
 	cm3.addItem(3013, "getRow");
 	cm3.addItem(3014, "setText");
+	cm3.addItem(3015, "GetSelCount");
+	cm3.addItem(3016, "SelIf");
+	cm3.addItem(3017, "Inset");
 	top1.show(hwnd);
 
 
@@ -159,8 +162,8 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	case 3008: {
 		UI_Lvitem item;
 		item.subItem[0].value = "0";
-		item.subItem[1].value = "Adolf";
-		item.subItem[2].value = "Germany";
+		item.subItem[1].value = "Tom";
+		item.subItem[2].value = "America";
 		ta1.addItem(item, 3);
 		break;
 	}
@@ -184,9 +187,30 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		cout << ta1.getItemText(ta1.getIndex(), 0);
 		cout << ta1.getItemText(ta1.getIndex(), 1);
 		cout << ta1.getItemText(ta1.getIndex(), 2);
+		
+		break;
 	}
 	case 3014: {
 		ta1.setItemText(ta1.getIndex(), 1, t1.getText());
+		break;
+	}
+	case 3015: {
+		cout << ta1.getSelCount();
+		break;
+	}
+	case 3016: {
+		cout << "||"<<ta1.getSelIf(0)<<"|"<< ta1.getSelIf(1) <<"|"<< ta1.getSelIf(2) <<"||";
+		cout << "项";
+		for (int i = 0; i < ta1.getCount(); i++)if(ta1.getSelIf(i))cout<<i<<",";
+		cout << "被选中";
+		break;
+	}
+	case 3017: {
+		UI_Lvitem item;
+		item.subItem[0].value = "1";
+		item.subItem[1].value = "Heinrich";
+		item.subItem[2].value = "Germany";
+		ta1.insertItem(ta1.getIndex() + 1, item, 3);
 		break;
 	}
 	default: {

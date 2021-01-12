@@ -793,11 +793,15 @@ public:
 	bool removeItem(int index);
 	char* getItemText(int index, int col);
 	bool setItemText(int index, int col,const char* str);
+
+	int getSelCount();
+	bool getSelIf(int index);/*判断某项是否被选中*/
+	
 };
 void TableBox::create(unsigned int Handle, HWND hparent) {
 	InitCommonControls();
 	this->id = Handle;
-	hwnd = CreateWindowEx(NULL,"SysListView32",0, LVS_REPORT |LVS_EX_GRIDLINES| LVS_SHOWSELALWAYS| LVS_EX_FULLROWSELECT |WS_CHILD | WS_VISIBLE | WS_BORDER,
+	hwnd = CreateWindowEx(NULL,"SysListView32",0, LVS_REPORT |WS_CHILD | WS_VISIBLE | WS_BORDER,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
 
 	ShowWindow(hwnd, SW_SHOW);
@@ -844,9 +848,10 @@ bool TableBox::removeItem(int index) {
 	return SendMessageA(hwnd, LVM_DELETEITEM, index, 0);
 }
 char* TableBox::getItemText(int index, int col) {
-	LPSTR lpstr=(LPSTR)"";
+	LPSTR lpstr=NULL;
 	char str[TableBoxMaxSting];
-	ListView_GetItemText(this->hwnd, index, col, (LPSTR)str, TableBoxMaxSting);
+	ZeroMemory(str,TableBoxMaxSting);
+	ListView_GetItemText(this->hwnd, index, col, str, TableBoxMaxSting);
 	return str;
 }
 bool TableBox::setItemText(int index, int col,const char* str) {
@@ -857,3 +862,11 @@ bool TableBox::setItemText(int index, int col,const char* str) {
 	p1.pszText = (LPSTR)str;
 	return SendMessageA(hwnd, LVM_SETITEMTEXT,index, (LPARAM)&p1);
 }
+int TableBox::getSelCount() {
+	return SendMessageA(hwnd, LVM_GETSELECTEDCOUNT, 0, 0);
+}
+bool TableBox::getSelIf(int index) {/*判断某项是否被选中*/
+	if(SendMessageA(hwnd, LVM_GETITEMSTATE, index, LVIS_SELECTED))return true;
+	return false;
+}
+

@@ -70,7 +70,7 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	cm3.addItem(3014, "setText");
 	cm3.addItem(3015, "GetSelCount");
 	cm3.addItem(3016, "SelIf");
-	cm3.addItem(3017, "Inset");
+	//cm3.addItem(3017, "Inset");
 	top1.show(hwnd);
 
 
@@ -210,7 +210,7 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		item.subItem[0].value = "1";
 		item.subItem[1].value = "Heinrich";
 		item.subItem[2].value = "Germany";
-		ta1.insertItem(ta1.getIndex() + 1, item, 3);
+		///ta1.insertItem(ta1.getIndex() + 1, item, 3);
 		break;
 	}
 	default: {
@@ -268,4 +268,8 @@ int /*WINAPI WinMain */main(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	///alert("", "");
 	win1.create_wind(640, 480);
 	return 0;
+}
+
+void TreeMain() {
+
 }

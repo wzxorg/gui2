@@ -54,7 +54,6 @@ LRESULT CALLBACK About(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case IDC_BUTTON1: {
-			
 			UI_Lvitem item1;
 			item1.subItem[0].value = get_Win_Text(GetDlgItem(hwnd, IDC_EDIT1));//第一列
 			item1.subItem[1].value = get_Win_Text(GetDlgItem(hwnd, IDC_EDIT2));//第二列

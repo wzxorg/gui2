@@ -1,7 +1,9 @@
 ﻿  lv.cpp
   main.cpp
+  progress.cpp
   tree.cpp
   正在生成代码...
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(807): warning C4172: 返回局部变量或临时变量的地址: str
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(862): warning C4172: 返回局部变量或临时变量的地址: temp
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\progress.cpp(72): warning C4715: “d3_wm_command”: 不是所有的控件路径都返回值
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(814): warning C4172: 返回局部变量或临时变量的地址: str
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(869): warning C4172: 返回局部变量或临时变量的地址: temp
   ClassProject2_cpps.vcxproj -> B:\programing\cpp\成品\gui2\ClassProject2_cpps\ClassProject2_cpps\Debug\ClassProject2_cpps.exe

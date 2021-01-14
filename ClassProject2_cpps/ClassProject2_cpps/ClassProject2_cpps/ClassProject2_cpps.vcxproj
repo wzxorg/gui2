@@ -123,13 +123,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="extstr.h" />
     <ClInclude Include="func.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ip.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="lv.cpp" />
+    <ClCompile Include="progress.cpp" />
     <ClCompile Include="tree.cpp" />
   </ItemGroup>
   <ItemGroup>

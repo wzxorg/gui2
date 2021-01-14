@@ -1,7 +1,6 @@
 #pragma once
 #include <iostream>
 #include <windows.h>
-#include <string>
 /********************************************
 *											*
 *Coptright 2020								*
@@ -17,7 +16,7 @@ using namespace std;
 #define text_char					char*
 #define const_text_char				const char*
 
-#define getFileName_char			gfn1
+#define getFileName_char			gfn
 #define childGetFileNmae_char		gfn1_child
 #define getFileNameSave				gfn_save
 
@@ -47,7 +46,16 @@ static char* G2U(const char* gb2312)
 	return str;
 }
 
-inline char* gfn1() {
+#define gfn_allFiles		"All Files (*.*)\0*.*\0\0"
+#define gfn_allFilesEx		""
+#define gfn_textFile		"Text Files (*.txt)\0*.txt\0\0"
+#define gfn_textFileA		"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0"
+#define gfn_textFileEx		"txt"
+#define gfn_richTextFile	"Rich Text Files (*.rtf)\0*.rtf\0\0"
+#define gfn_richTextFileA	"Rich Text Files (*.rtf)\0*.rtf\0All Files (*.*)\0*.*\0\0"
+#define gfn_richTextFileEx	"rtf"
+
+inline char* gfn(HWND Hparent,const char * fileType,const char * ext) {
 
 	OPENFILENAME ofn;
 
@@ -57,11 +65,11 @@ inline char* gfn1() {
 	szFileName[0] = 0;
 
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;
-	ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0";
+	ofn.hwndOwner = Hparent;
+	ofn.lpstrFilter = fileType;
 	ofn.lpstrFile = szFileName; //文件名将被保存在此变量中 
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrDefExt = "txt";
+	ofn.lpstrDefExt = ext;
 	ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 	//定义完了对话框
 	GetOpenFileName(&ofn);
@@ -70,7 +78,6 @@ inline char* gfn1() {
 	return str;
 
 }
-
 inline char* gfn1_child(HWND hwnd) {
 
 	OPENFILENAME ofn;
@@ -93,7 +100,7 @@ inline char* gfn1_child(HWND hwnd) {
 	strcpy(str, szFileName);
 	return str;
 }
-inline char* gfn_save(HWND hwnd) {
+inline char* gfn_save(HWND hwnd,const char* fileType,const char* ext) {
 	OPENFILENAME ofn;
 
 	char szFileName[MAX_PATH];
@@ -103,10 +110,10 @@ inline char* gfn_save(HWND hwnd) {
 
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = hwnd;
-	ofn.lpstrFilter = "Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0\0";
+	ofn.lpstrFilter = fileType;
 	ofn.lpstrFile = szFileName; //文件名将被保存在此变量中 
 	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrDefExt = "txt";
+	ofn.lpstrDefExt = ext;
 	ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
 	ofn.lpstrTitle = "另存为";
@@ -696,7 +703,17 @@ inline bool SaveFile_char(char* fileText, LPSTR pszFileName) {
 #include <commctrl.h>
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
-#define TableBoxMaxSting 4100//获取tablebox中字符串的最大长度4and1/256 kBytes，必要时可修改
+
+/********************************************
+*											*
+*Coptright 2020								*
+*Win32 API Graphic programming Class library*
+*Made By wzx000000@outlook.com				*
+*											*
+********************************************/
+
+#define TableBoxMaxSting	4100//获取tablebox中字符串的最大长度(4 and 1/256 kBytes)，必要时可修改
+#define TableBoxMaxCol		128//tablebox中字符串的最大列数 (128)，必要时可修改
 
 class Dialog {
 public:
@@ -742,11 +759,11 @@ public:
 
 class UI_LvPop {
 public:
-	UI_LvCol cols[128];
+	UI_LvCol cols[TableBoxMaxCol];
 };
 class UI_Lvitem {
 public:
-	UI_Lvsubitem  subItem[128];
+	UI_Lvsubitem  subItem[TableBoxMaxCol];
 };
 class TableBox : public  ListBasicControl {
 public:
@@ -826,7 +843,7 @@ public:
 };
 
 #define UI_TVI HTREEITEM
-#define TreeBoxMaxSting 4100
+#define TreeBoxMaxSting 4100//获取treebox中字符串的最大长度(4 and 1/256 kBytes)，必要时可修改
 class TreeBox :public ListBasicControl {
 public:
 	void create(unsigned int Handle, HWND hparent) {
@@ -877,3 +894,76 @@ public:
 		return SendMessage(hwnd, TVM_DELETEITEM, 0, (LPARAM)NULL);
 	}
 };
+class ProgressBar :public BasicControl {
+public:
+	void create(unsigned int Handle, HWND hparent) {
+		InitCommonControls();
+		this->id = Handle;
+		hwnd = CreateWindowEx(NULL, "msctls_progress32", 0, WS_CHILD | WS_VISIBLE | WS_BORDER,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+
+		ShowWindow(hwnd, SW_SHOW);
+		this->hwnd_parent = hparent;
+	}
+	bool setRange(int value) {
+		return SendMessage(hwnd, PBM_SETRANGE32, 0, (LPARAM)value);
+	}
+	bool setPos(int value) {
+		return SendMessage(hwnd, PBM_SETPOS, (WPARAM)value, 0);
+	}
+	unsigned int getPos() {
+		return SendMessage(hwnd, PBM_GETPOS, 0, 0);
+	}
+	unsigned int getHighLimit() {
+		return SendMessage(hwnd, PBM_GETRANGE, 0, 0);
+	}
+	unsigned int getLowLimit() {
+		return SendMessage(hwnd, PBM_GETRANGE, 1, 0);
+	}
+};
+
+class CheckBox : public BasicControl {
+public:
+	void create(unsigned int Handle, HWND hparent) {
+		hwnd_parent = hparent;
+		id = Handle;
+		hwnd = CreateWindow("BUTTON", "", BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+		SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	}
+	bool getCheckIf() {
+		if(SendMessage(hwnd, BM_GETCHECK,0,0)== BST_CHECKED)return true;
+		return false;
+	}
+	bool getUncheckIf() {
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_UNCHECKED)return true;
+		return false;
+	}
+	bool setCheck() {
+		return SendMessage(hwnd, BM_SETCHECK, BST_CHECKED, 0);
+	}
+	bool setUnchecked() {
+		return SendMessage(hwnd, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+};
+class CheckBox3 : public CheckBox {
+public:
+	void create(unsigned int Handle, HWND hparent) {
+		hwnd_parent = hparent;
+		id = Handle;
+		hwnd = CreateWindow("BUTTON", "", BS_AUTO3STATE | WS_CHILD | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+		SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	}
+	bool setIndeterminate() {
+		return SendMessage(hwnd, BM_SETCHECK, BST_INDETERMINATE, 0);
+	}
+	bool getIndeterminateIf() {
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_INDETERMINATE)return true;
+		return false;
+	}
+	int getState() {
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_INDETERMINATE)return BST_INDETERMINATE;
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_CHECKED)return BST_CHECKED;
+		return BST_UNCHECKED;
+	}
+};
+

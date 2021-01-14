@@ -1,6 +1,7 @@
 #include "main.h"
 #include "func.h"
 #include "resource.h"
+#include "extstr.h"
 //#include "resource.h"
 TextBox t1;
 BorderText t2;
@@ -18,6 +19,12 @@ childMenu cm3;
 childMenu cm4;
 TreeBox treeb1;
 childMenu cm5;
+ProgressBar pb1;
+childMenu cm6;
+CheckBox ch1;
+childMenu cm7;
+CheckBox3 ch2;
+childMenu cm8;
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -79,12 +86,28 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	cm4.create(top1.h_menu, "Thread");
 	cm4.addItem(3017, "Show lv.cpp");
 	cm4.addItem(3018, "SHow tree.cpp");
+	
 
 	cm5.create(top1.h_menu, "TreeView");
 	cm5.addItem(3019, "Add");
 	cm5.addItem(3020, "Set");
 	cm5.addItem(3021, "Delete");
 	cm5.addItem(3022, "Get");
+
+	cm4.addItem(3023, "Show progress.cpp");
+
+	cm6.create(top1.h_menu, "Progress Bar");
+	cm6.addItem(3024,"Begin");
+	cm6.addItem(3025,"Get Range");
+	cm7.create(top1.h_menu, "Check Box");
+	cm7.addItem(3026, "CheckIf");
+	cm7.addItem(3027, "Checked");
+	cm7.addItem(3028, "Uncheck");
+	cm7.addItem(3029, "IndeterminateIF");
+	cm7.addItem(3030, "Indeterminate");
+	cm7.addItem(3031, "getState");
+	
+
 	top1.show(hwnd);
 
 
@@ -92,7 +115,12 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
 	ta1.create(1003, hwnd);
 	treeb1.create(1004, hwnd);
+	pb1.create(1005, hwnd);
 
+	ch1.create(1006,hwnd);
+	ch1.setText("123");
+	ch2.create(1007, hwnd);
+	ch2.setText("456");
 	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
 	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
@@ -105,11 +133,16 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	b1[1].setLocation(200, 0, 50, 30);
 	b1[2].setLocation(250, 0, 50, 30);
 	b1[3].setLocation(300, 0, 50, 30);
+	b1[5].setLocation(350, 0, 50, 30);
 	l1.setLocation(0, 60, 100, 100);
 	list1.setLocation(0, 200, 200, 200);
 	b1[4].setLocation(200, 200, 50, 30);
 	ta1.setLocation(300, 60, 250, 150);
 	treeb1.setLocation(300, 250, 250, 150);
+	pb1.setLocation(300, 410, 250, 40);
+	ch1.setLocation(300, 450, 250, 20);
+	
+	ch2.setLocation(300, 480, 250, 20);
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch (wParam)
@@ -129,7 +162,7 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		break;
 	}
 	case 2003: {
-		t1.setText(readFile_char(CHAR_ToLPSTR(childGetFileNmae_char(hwnd))));
+		t1.setText(readFile_char(CHAR_ToLPSTR(gfn(hwnd,gfn_textFileA,gfn_richTextFileEx))));
 		break;
 	}
 	case 3001: {
@@ -148,6 +181,12 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		t1.setText(list1.getItemText(list1.getIndex(), 260));
 		break;
 	}
+	case 2005: {
+		string str = intTOstr(123);
+		char *p = (char*)str.data();
+		alert(p,"");
+		break;
+	}
 	case 3004: {
 		list1.add("123");
 		break;
@@ -159,7 +198,7 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	case 3006: {
 		//alert(gfn_save(hwnd),"");
 		//alert(gfn1_child(hwnd), "");
-		SaveFile_char(t1.getText(), gfn_save(hwnd));
+		SaveFile_char(t1.getText(), gfn_save(hwnd,gfn_textFileA,gfn_textFileEx));
 		break;
 	}
 	case 3007: {
@@ -247,6 +286,60 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		t1.setText(treeb1.getItemText(treeb1.getSelItem()));
 		break;
 	}
+	case 3023: {
+		thread task3(PMain, all_hins, all_lpCmdLine, all_nShowCmd);
+		task3.detach();
+		break;
+	}
+	case 3024: {
+		pb1.setRange(1000);
+		for (int i = 0; i < 1001;i=i+50) {
+			Sleep(1000);
+			pb1.setPos(i);
+			string str = intTOstr(pb1.getPos());
+			char *p = (char*)str.data();
+			t1.setText(p);
+		};
+		alert("Done","");
+		break;
+	}
+	case 3025: {
+		string str = intTOstr(pb1.getHighLimit());
+		char *p = (char*)str.data();
+		alert(p,"");
+		str = intTOstr(pb1.getLowLimit());
+		p = (char*)str.data();
+		alert(p, "");
+		break;
+	}
+	case 3026: {
+		if (ch1.getCheckIf())alert("1","");
+		else alert("0","");
+		break;
+	}
+	case 3027: {
+		ch1.setCheck();
+		break;
+	}
+	case 3028: {
+		ch1.setUnchecked();
+		break;
+	}
+	case 3029: {
+		if (ch2.getIndeterminateIf())alert("1", "");
+		else alert("0", "");
+		break;
+	}
+	case 3030: {
+		ch2.setIndeterminate();
+		break;
+	}
+	case 3031: {
+		string str = intTOstr(ch2.getState());
+		char *p = (char*)str.data();
+		alert(p, "");
+		break;
+	}
 	default: {
 
 		break;
@@ -303,6 +396,6 @@ int WINAPI WinMain/* main*/(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	all_lpCmdLine = lpCmdLine;
 	all_nShowCmd = nCmdShow;
 
-	win1.create_wind(640, 480);
+	win1.create_wind(800, 600);
 	return 0;
 }

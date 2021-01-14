@@ -10,10 +10,10 @@
 
 void WINAPI LvMain(HINSTANCE hInstance, LPSTR lpCmdLine, int nShowCmd);
 void WINAPI TreeMain(HINSTANCE hInstance, LPSTR lpCmdLine, int nShowCmd);
+void WINAPI PMain(HINSTANCE hInstance, LPSTR lpCmdLine, int nShowCmd);
 
 static HINSTANCE all_hins=NULL;
 static LPSTR all_lpCmdLine = NULL;
 static int all_nShowCmd = NULL;
 static Window_ win1;
 static Dialog dlg2;
-

@@ -1,6 +1,6 @@
 ﻿  main.cpp
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(514): warning C4060: switch 语句没有包含“case”或“default”标签
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(479): warning C4101: “szFileName”: 未引用的局部变量
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(571): warning C4060: switch 语句没有包含“case”或“default”标签
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(528): warning C4101: “szFileName”: 未引用的局部变量
 b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1021): warning C4172: 返回局部变量或临时变量的地址: str
 b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1108): warning C4172: 返回局部变量或临时变量的地址: temp
 b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1061): warning C4172: 返回局部变量或临时变量的地址: str

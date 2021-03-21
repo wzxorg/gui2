@@ -965,7 +965,7 @@ public:
 class TableBox : public  ListBasicControl {
 public:
 	void create(unsigned int Handle, HWND hparent) {
-		InitCommonControls();
+		//InitCommonControls();
 		this->id = Handle;
 		hwnd = CreateWindowEx(NULL, "SysListView32", 0, LVS_REPORT | WS_CHILD | WS_VISIBLE | WS_BORDER,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
@@ -1259,6 +1259,9 @@ public:
 	}
 };
 
+typedef MdiChildWindowClass		UIMdiChildWindowClass;
+typedef MDIClient				UIMDIClient;
+
 inline HWND createTableBox(unsigned int Handle, HWND hparent) {
 	HWND hwnd = CreateWindowEx(NULL, "SysListView32", 0, LVS_REPORT | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
@@ -1465,3 +1468,99 @@ inline unsigned int ProgressBar_getLowLimit(HWND hwnd) {
 	return SendMessage(hwnd, PBM_GETRANGE, 1, 0);
 }
 
+class RadioButton : public BasicControl {
+public:
+	void create(unsigned int Handle, HWND hparent) {
+		hwnd_parent = hparent;
+		id = Handle;
+		hwnd = CreateWindow("BUTTON", "", WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+		SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	}
+	bool getCheckIf() {
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_CHECKED)return true;
+		return false;
+	}
+	bool getUncheckIf() {
+		if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_UNCHECKED)return true;
+		return false;
+	}
+	bool setCheck() {
+		return SendMessage(hwnd, BM_SETCHECK, BST_CHECKED, 0);
+	}
+	bool setUnchecked() {
+		return SendMessage(hwnd, BM_SETCHECK, BST_UNCHECKED, 0);
+	}
+};
+
+inline HWND createRadioButton(unsigned int Handle, HWND hparent) {
+	HWND hwnd= CreateWindow("BUTTON", "", WS_CHILD | WS_VISIBLE | BS_AUTORADIOBUTTON, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+
+#define RadioButton_getCheckIf			CheckBox_getCheckIf
+#define RadioButton_getUncheckIf		CheckBox_getUncheckIf
+#define	RadioButton_setCheck			CheckBox_setCheck
+#define	RadioButton_setUnchecked		CheckBox_setUnchecked
+
+typedef RadioButton UIRadioButton;
+
+class ToolBar : public ListBasicControl {
+public:
+	HWND create(unsigned int Handle, HWND hparent) {
+		hwnd= CreateWindowEx(0, TOOLBARCLASSNAME, NULL,
+			WS_CHILD | WS_VISIBLE, 0, 0, 0, 0,
+			hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+		hwnd_parent = hparent;
+		id = Handle;
+		ShowWindow(hwnd, SW_SHOW);
+		SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+		SendMessage(hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+		return hwnd;
+	}
+	void addStdBitmap() {
+		TBADDBITMAP tbab;
+		tbab.hInst = HINST_COMMCTRL;
+		tbab.nID = IDB_STD_SMALL_COLOR;
+		SendMessage(hwnd, TB_ADDBITMAP, 0, (LPARAM)&tbab);
+	}
+	void addButtons(TBBUTTON * tbb,int nButtons) {
+		SendMessage(hwnd, TB_ADDBUTTONS, nButtons, (LPARAM)tbb);
+	}
+	void addBitmapList(const int ImageListID,HIMAGELIST g_hImageList) {
+		SendMessage(hwnd, TB_SETIMAGELIST,
+			(WPARAM)ImageListID,
+			(LPARAM)g_hImageList);
+	}
+};
+
+class StatusBar : public ListBasicControl {
+public:
+	HWND create(unsigned int Handle, HWND hparent) {
+		this->hwnd=CreateWindowEx(0, "msctls_statusbar32", NULL,
+			WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP, 0, 0, 0, 0,
+			hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+		hwnd_parent = hparent;
+		id = Handle;
+		ShowWindow(hwnd, SW_SHOW);
+		SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+		return hwnd;
+	}
+	bool setParts(int iStatusWidths[], int cols) {
+		return SendMessage(this->hwnd, SB_SETPARTS, cols, (LPARAM)iStatusWidths);
+	}
+	bool setText(int iSubitem,const char* str) {
+		return SendMessage(this->hwnd, SB_SETTEXT, iSubitem, (LPARAM)str);
+	}
+	char* getText(int iSubitem) {
+		char* str = NULL;
+		int size = (int)SendMessage(this->hwnd, SB_GETTEXTLENGTH, iSubitem, 0);
+		str = new char[size];
+		SendMessage(this->hwnd, SB_GETTEXT, iSubitem, (LPARAM)str);
+		return str;
+	}
+};
+
+typedef ToolBar		UIToolBar;
+typedef StatusBar	UIStatusBar;

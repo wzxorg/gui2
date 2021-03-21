@@ -28,6 +28,8 @@ childMenu cm8;
 childMenu cm9;
 MDIClient mdi1;
 HINSTANCE mdiHins;
+StatusBar st1;
+ToolBar tool1;
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -134,22 +136,63 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
 	
 	mdi1.create(4777, hwnd,all_hins,50000,NULL);
-	
-	
+	st1.create(4778, hwnd);
+	int widths[] = {100,200,100};
+	st1.setParts(widths, 3);
+	st1.setText(1, "1123");
+	char * str = st1.getText(1);
+	//alert(str, "");
+	st1.setText(0, str);
 	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
 	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
+	tool1.create(4779,hwnd);
+	tool1.addStdBitmap();
+	TBBUTTON tbb[2];
+	ZeroMemory(tbb, sizeof(tbb));
+	tbb[0].iBitmap = STD_FILENEW;
+	tbb[0].fsState = TBSTATE_ENABLED;
+	tbb[0].fsStyle = TBSTYLE_BUTTON;
+	tbb[0].idCommand = 11001;
 
+	tbb[1].iBitmap = STD_FILEOPEN;
+	tbb[1].fsState = TBSTATE_ENABLED;
+	tbb[1].fsStyle = TBSTYLE_BUTTON;
+	tbb[1].idCommand = 11002;
+	tool1.addButtons(tbb,2);
+
+	//自定义图标
+	int bitmapSize = 20;
+	HBITMAP bitmap = (HBITMAP)LoadImage((HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE), MAKEINTRESOURCE(IDB_BITMAP1), IMAGE_BITMAP, bitmapSize, bitmapSize, NULL);
+	HIMAGELIST hImageList=ImageList_Create(bitmapSize, bitmapSize,   // Dimensions of individual bitmaps.
+		ILC_COLOR24 | ILC_MASK,   // Ensures transparent background.
+		1, 0);
+	ImageList_Add(hImageList, bitmap, 0);
+	ImageList_Add(hImageList, bitmap, 0);
+
+	ZeroMemory(tbb, sizeof(tbb));
+	tbb[0].iBitmap = 0;
+	tbb[0].fsState = TBSTATE_ENABLED;
+	tbb[0].fsStyle = TBSTYLE_BUTTON;
+	tbb[0].idCommand = 11001;
+
+	tbb[1].iBitmap = 1;
+	tbb[1].fsState = TBSTATE_ENABLED;
+	tbb[1].fsStyle = TBSTYLE_BUTTON;
+	tbb[1].idCommand = 11002;
+
+	tool1.addBitmapList(0, hImageList);
+	tool1.addButtons(tbb, 2);
 }
 void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
-	t1.setLocation(0, 0, 100, 120);
-	b1[0].setLocation(110, 0, 50, 30);
-	b1[1].setLocation(200, 0, 50, 30);
-	b1[2].setLocation(250, 0, 50, 30);
-	b1[3].setLocation(300, 0, 50, 30);
-	b1[5].setLocation(350, 0, 50, 30);
-	l1.setLocation(0, 120, 100, 40);
+	t1.setLocation(0, 30, 100, 120);
+	b1[0].setLocation(110, 30, 50, 30);
+	b1[1].setLocation(200, 30, 50, 30);
+	b1[2].setLocation(250, 30, 50, 30);
+	b1[3].setLocation(300, 30, 50, 30);
+	b1[5].setLocation(350, 30, 50, 30);
+	l1.setLocation(0, 150, 100, 40);
 	list1.setLocation(0, 200, 200, 200);
 	b1[4].setLocation(200, 200, 50, 30);
 	ta1.setLocation(300, 60, 250, 150);
@@ -158,7 +201,9 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	ch1.setLocation(300, 450, 250, 20);
 	
 	ch2.setLocation(300, 480, 250, 20);
-	mdi1.setLocation(600, 0, 350, 500);
+	mdi1.setLocation(600, 30, 350, 500);
+	st1.setLocation(0, WindowHeight-30, 500, 30);
+	tool1.setLocation(0, 600, 100, 20);
 	//MoveWindow(mdi1.getHwnd(), 600, 0,350 ,400, TRUE);
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
@@ -389,6 +434,10 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		mdi1.createChildWindow(all_hins, "childClass1", "Form1");
 		break;
 	}
+	case 11001: {
+		alert("toolbar0","");
+		break;
+	}
 	default: {
 		if (LOWORD(wParam) >= 50000) {
 			DefFrameProc(hwnd, mdi1.getHwnd(), Message, wParam, lParam);
@@ -497,8 +546,16 @@ LRESULT CALLBACK MDIChildWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM 
 		setWinLocation(UIgetDlgItem(1002),0, WindowHeight / 2, WindowWidth, WindowHeight / 2);
 		break;
 	case WM_MDIACTIVATE: {
-
-
+		bool EnableFlag;
+		if (hwnd == (HWND)lParam) {      //being activated
+			EnableFlag = TRUE;
+		}
+		else {
+			EnableFlag = FALSE;    //being de-activated
+		}
+		if (EnableFlag) {
+			st1.setText(0, get_Win_Text(hwnd));
+		}
 		//DrawMenuBar(g_hMainWindow);
 
 		break;
@@ -559,6 +616,6 @@ int WINAPI WinMain/* main*/(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 
 	mdiHins = hInstance;
 
-	win1.create_wind(1000, 600);
+	win1.create_wind(1000, 700);
 	return 0;
 }

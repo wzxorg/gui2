@@ -1,9 +1,7 @@
-﻿  lv.cpp
-  main.cpp
-  progress.cpp
-  tree.cpp
-  正在生成代码...
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\progress.cpp(72): warning C4715: “d3_wm_command”: 不是所有的控件路径都返回值
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(814): warning C4172: 返回局部变量或临时变量的地址: str
-b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(869): warning C4172: 返回局部变量或临时变量的地址: temp
+﻿  main.cpp
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(514): warning C4060: switch 语句没有包含“case”或“default”标签
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\main.cpp(479): warning C4101: “szFileName”: 未引用的局部变量
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1021): warning C4172: 返回局部变量或临时变量的地址: str
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1108): warning C4172: 返回局部变量或临时变量的地址: temp
+b:\programing\cpp\成品\gui2\classproject2_cpps\classproject2_cpps\classproject2_cpps\func.h(1061): warning C4172: 返回局部变量或临时变量的地址: str
   ClassProject2_cpps.vcxproj -> B:\programing\cpp\成品\gui2\ClassProject2_cpps\ClassProject2_cpps\Debug\ClassProject2_cpps.exe

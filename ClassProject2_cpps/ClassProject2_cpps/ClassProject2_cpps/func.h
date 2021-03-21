@@ -118,7 +118,7 @@ inline char* gfn_save(HWND hwnd,const char* fileType,const char* ext) {
 
 	ofn.lpstrTitle = "另存为";
 	//定义完了对话框
-	GetOpenFileName(&ofn);
+	GetSaveFileName(&ofn);
 	char* str = new char[MAX_PATH];
 	strcpy(str, szFileName);
 	return str;
@@ -172,6 +172,10 @@ inline bool SaveFile(HWND hEdit, LPSTR pszFileName) {
 	}
 	return bSuccess;
 }
+inline bool deleteFile(const char* Path) {
+	if (remove(Path) == 0)return true;
+	return false;
+}
 
 inline void alert(const char str[], const char captain[]) {
 	MessageBox(NULL, str, captain, NULL | MB_OK);
@@ -185,14 +189,14 @@ inline bool confirm(const char str[], const char captain[]) {
 }
 
 
-class Window_ {
+class Window {
 public:
 	WNDCLASSEX wc; /* A properties struct of our window							窗口的属性结构 */
 	HWND hwnd; /* A 'HANDLE', hence the H, or a pointer to our window			一个“句柄”，因此是H，或者指向我们窗口的指针  */
 	MSG msg; /* A temporary location for all messages							 所有消息的临时位置*/
 	HINSTANCE his;
 	char caption[256] = "Form";
-	Window_(/*WNDPROC , HINSTANCE*/) {
+	Window(/*WNDPROC , HINSTANCE*/) {
 		//构造函数
 		memset(&this->wc, 0, sizeof(this->wc));
 		this->wc.cbSize = sizeof(WNDCLASSEX);
@@ -399,7 +403,6 @@ public:
 	}
 
 };
-
 
 class BorderLabel : public Label {
 public:
@@ -622,25 +625,24 @@ inline char* get_Win_Text(HWND hwnd) {
 inline bool set_Win_Text(HWND hwnd, const char str[]) {
 	return SetWindowText(hwnd, str);
 }
-
 inline int getVersionInt() { return HEADER_FILE_VERSION; }
-
 inline bool setWinIcon(HINSTANCE hins, HWND hParent, LPSTR name) {
 	HICON hIcon = LoadIcon(hins, name);
 	return SendMessage(hParent, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 }
-
 inline bool setImage(HINSTANCE hins, HWND hwnd, LPSTR name) {
 	HBITMAP	hBmp;
 	hBmp = LoadBitmap(hins, name);
 	return SendMessage(hwnd, BM_SETIMAGE, IMAGE_BITMAP, (LPARAM)hBmp);
 }
-
-//IO
-
 inline bool setDefFont(HWND hwnd) {
 	return SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
 }
+inline void setWinLocation(HWND hwnd, int x, int y, int width, int height) {
+	MoveWindow(hwnd, x, y, width, height, TRUE);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+}
+//IO
 
 inline LPSTR CHAR_ToLPSTR(const char* str) {
 	return (LPSTR)str;
@@ -700,20 +702,215 @@ inline bool SaveFile_char(char* fileText, LPSTR pszFileName) {
 	return bSuccess;
 }
 
+//Control Marcos
+inline HWND createTextBox(const char str[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("EDIT", str, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createSimpleText(const char str[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("EDIT", str, WS_CHILD | WS_VISIBLE | ES_WANTRETURN | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createBorderText(const char str[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("EDIT", str, WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createLabel(const char captain[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow(
+		"STATIC",
+		captain,
+		WS_CHILD | WS_VISIBLE | SS_LEFT,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		hparent,
+		(HMENU)Handle,
+		GetModuleHandle(NULL),
+		NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createBorderLabel(const char captain[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow(
+		"STATIC",
+		captain,
+		WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		hparent,
+		(HMENU)Handle,
+		GetModuleHandle(NULL),
+		NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createCenterLabel(const char captain[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow(
+		"STATIC",
+		captain,
+		WS_CHILD | WS_VISIBLE | SS_CENTERIMAGE,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		hparent,
+		(HMENU)Handle,
+		GetModuleHandle(NULL),
+		NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createButton(const char captain[], unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("BUTTON", captain, WS_CHILD | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createListBox(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("LISTBOX", NULL, WS_CHILD | WS_VSCROLL | WS_TABSTOP | LBS_STANDARD | /*LBS_OWNERDRAWFIXED | */LBS_HASSTRINGS | WS_VISIBLE,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createComboBox(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWN | WS_VSCROLL | CBS_HASSTRINGS,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HWND createComboBoxList(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("COMBOBOX", NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL | CBS_HASSTRINGS,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+
+inline void Combo_add(HWND hwnd,const char str[]) {
+	SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str);
+}
+inline char* Combo_getText(HWND hwnd ,int size) {
+	DWORD dwTextLength;
+	dwTextLength = GetWindowTextLength(hwnd);
+	LPSTR pszText;
+	pszText = (LPSTR)GlobalAlloc(GPTR, dwTextLength + 1);
+	GetWindowText(hwnd, pszText, dwTextLength + 1);
+	return (char*)pszText;
+}
+inline int Combo_getIndex(HWND hwnd) {
+	int lbItem = (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0);
+	return lbItem;
+}
+inline void Combo_removeItem(HWND hwnd, int index) {
+	SendMessage(hwnd, CB_DELETESTRING, index, 0);
+}
+inline void Combo_insertItem(HWND hwnd, int index, const char str[]) {
+	SendMessage(hwnd, CB_INSERTSTRING, index, (LPARAM)str);
+}
+inline void Combo_setItemText(HWND hwnd, int index, const char str[]) {
+	Combo_removeItem(hwnd,index);
+	Combo_insertItem(hwnd,index, str);
+}
+inline char* Combo_getItemText(HWND hwnd, int index, int size) {
+	if (size <= 0)return false;
+	char* str = new char[size];
+	ZeroMemory(str, size);
+	if (index > -1)
+		SendMessage(hwnd, CB_GETLBTEXT, index, (LPARAM)str);
+	else return false;
+	return str;
+}
+inline void Combo_clean(HWND hwnd) {
+	SendMessage(hwnd, CB_RESETCONTENT, 0, 0);
+}
+inline int Combo_getCount(HWND hwnd) {
+	return (int)SendMessage(hwnd, CB_GETCOUNT, 0, 0);
+}
+
+inline void ListBox_add(HWND hwnd, const char str[]) {
+	SendMessage(hwnd, LB_ADDSTRING, 0, (LPARAM)str);
+}
+inline char* ListBox_getText(HWND hwnd, int size) {
+	if (size <= 0)return false;
+	int lbItem = (int)SendMessage(hwnd, LB_GETCURSEL, 0, 0);
+	char* str = new char[size];
+	ZeroMemory(str, size);
+	if (lbItem > -1)
+		SendMessage(hwnd, LB_GETTEXT, lbItem, (LPARAM)str);
+	else return false;
+	return str;
+}
+inline int ListBox_getIndex(HWND hwnd) {
+	int lbItem = (int)SendMessage(hwnd, LB_GETCURSEL, 0, 0);
+	return lbItem;
+}
+inline void ListBox_removeItem(HWND hwnd, int index) {
+	SendMessage(hwnd, LB_DELETESTRING, index, 0);
+}
+inline void ListBox_insertItem(HWND hwnd, int index, const char str[]) {
+	SendMessage(hwnd, LB_INSERTSTRING, index, (LPARAM)str);
+}
+inline void ListBox_setItemText(HWND hwnd, int index, const char str[]) {
+	ListBox_removeItem(hwnd, index);
+	ListBox_insertItem(hwnd, index, str);
+}
+inline char* ListBox_getItemText(HWND hwnd, int index, int size) {
+	if (size <= 0)return false;
+	char* str = new char[size];
+	ZeroMemory(str, size);
+	if (index > -1)
+		SendMessage(hwnd, LB_GETTEXT, index, (LPARAM)str);
+	else return false;
+	return str;
+}
+inline void ListBox_clean(HWND hwnd) {
+	SendMessage(hwnd, LB_RESETCONTENT, 0, 0);
+}
+inline int ListBox_getCount(HWND hwnd) {
+	return (int)SendMessage(hwnd, LB_GETCOUNT, 0, 0);
+}
+
+#define WindowWidth LOWORD(lParam)
+#define WindowHeight HIWORD(lParam)
+#define UIgetDlgItem(id) GetDlgItem(hwnd, id)
+
+typedef Window			UIWindow;
+typedef TextBox			UITextBox;
+typedef SimpleText		UISimpleText;
+typedef BorderText		UIBorderText;
+typedef Button			UIButton;
+typedef Label			UILabel;
+typedef BorderLabel		UIBorderLabel;
+typedef CenterLabel		UICenterLabel;
+typedef ListBox			UIListBox;
+typedef ComboBox		UIComboBox;
+typedef ComboBoxList	UIComboBoxList;
+typedef Topmenu			UITopmenu;
+typedef childMenu		UIchildMenu;
+typedef RtMenu			UIRtMenu;
 #include <commctrl.h>
 #include <stdio.h>
 #pragma comment(lib, "comctl32.lib")
 
-/********************************************
-*											*
-*Coptright 2020								*
-*Win32 API Graphic programming Class library*
-*Made By wzx000000@outlook.com				*
-*											*
-********************************************/
+/********************************************************
+*														*
+*Coptright 2020-2021									*
+*Win32 API Advanced Graphic programming Class library	*
+*Made By wzx000000@outlook.com							*
+*														*
+********************************************************/
 
 #define TableBoxMaxSting	4100//获取tablebox中字符串的最大长度(4 and 1/256 kBytes)，必要时可修改
 #define TableBoxMaxCol		128//tablebox中字符串的最大列数 (128)，必要时可修改
+
 
 class Dialog {
 public:
@@ -839,8 +1036,40 @@ public:
 		if (SendMessageA(hwnd, LVM_GETITEMSTATE, index, LVIS_SELECTED))return true;
 		return false;
 	}/*判断某项是否被选中*/
-
+	void clearAll() {
+		int nCols = 0;			//ListView列数
+		HWND hWnd, hWndHeader;
+		LVITEM lvItem;
+		hWnd = hwnd;
+		SendMessage(hWnd, LVM_DELETEALLITEMS, 0, 0);
+		hWndHeader = (HWND)SendMessage(hWnd, LVM_GETHEADER, 0, 0);
+		nCols = SendMessage(hWndHeader, HDM_GETITEMCOUNT, 0, 0);
+		while (nCols)
+		{
+			SendMessage(hWnd, LVM_DELETECOLUMN, 0, (LPARAM)&lvItem);
+			nCols--;
+		}
+	}
+	char * getColumeText(int index) {
+		LVCOLUMN lvc;
+		lvc.mask = LVCF_TEXT;
+		lvc.cchTextMax = TableBoxMaxSting;
+		lvc.iSubItem = index;
+		char str[TableBoxMaxSting];
+		lvc.pszText = str;
+		ListView_GetColumn(hwnd, index, &lvc);
+		return str;
+	}
+	int getColCount() {
+		HWND hWndHeader = (HWND)SendMessage(this->hwnd, LVM_GETHEADER, 0, 0);
+		return SendMessage(hWndHeader, HDM_GETITEMCOUNT, 0, 0);
+	}
 };
+
+typedef Dialog		UIDialog;
+typedef UI_LvPop	UILvPop;
+typedef UI_Lvitem	UILvitem;
+typedef TableBox	UITableBox;
 
 #define UI_TVI HTREEITEM
 #define TreeBoxMaxSting 4100//获取treebox中字符串的最大长度(4 and 1/256 kBytes)，必要时可修改
@@ -966,4 +1195,273 @@ public:
 		return BST_UNCHECKED;
 	}
 };
+
+class MdiChildWindowClass {
+public:
+	WNDCLASSEX wc;
+	MdiChildWindowClass() {
+		wc.cbSize = sizeof(WNDCLASSEX);
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_3DSHADOW + 1);
+		wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+		wc.lpszMenuName = NULL;
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	}
+	bool registerWindowClass(HINSTANCE hinst,WNDPROC callback,LPCSTR className) {
+		wc.lpfnWndProc = callback;
+		wc.hInstance = hinst;
+		wc.lpszClassName = className;
+		if (!RegisterClassEx(&wc)) {
+			//MessageBox(0, "Could Not Register Child Window", "Oh Oh...",MB_ICONEXCLAMATION | MB_OK);
+			return false;
+		}
+		return true;
+	}
+};
+
+class MDIClient :public ListBasicControl{
+public:
+	
+	void create(unsigned int Handle, HWND hparent,HINSTANCE hinst,int ID_MDI_FIRSTCHILD,void * HWindowMenu) {
+		CLIENTCREATESTRUCT ccs;
+		ccs.hWindowMenu = HWindowMenu;
+		//ccs.hWindowMenu = NULL;
+		ccs.idFirstChild = ID_MDI_FIRSTCHILD;//第一个子窗体ID
+
+		this->hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, "mdiclient", NULL,
+			WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			hparent, (HMENU)Handle, hinst, (LPVOID)&ccs);
+		ShowWindow(this->hwnd, SW_SHOW);
+		this->id = Handle;
+		this->hwnd_parent = hparent;
+	}
+	bool createChildWindow(HINSTANCE hinst,LPCSTR classNmae,LPCSTR caption) {
+		MDICREATESTRUCT mcs;
+		HWND hChild;
+
+		mcs.szTitle = caption;
+		mcs.szClass = classNmae;
+		mcs.hOwner = hinst;
+		mcs.x = mcs.cx = CW_USEDEFAULT;
+		mcs.y = mcs.cy = CW_USEDEFAULT;
+		mcs.style = MDIS_ALLCHILDSTYLES;
+
+		hChild = (HWND)SendMessage(this->hwnd, WM_MDICREATE, 0, (LPARAM)&mcs);
+		if (!hChild) {
+			return false;
+		}
+		return true;
+	}
+};
+
+inline HWND createTableBox(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindowEx(NULL, "SysListView32", 0, LVS_REPORT | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline void TableBox_setColume(HWND hwnd, UI_LvPop cols, int numOfCol/*列的数量*/) {
+
+	LV_COLUMN lvc;
+	lvc.mask = LVCF_TEXT | LVCF_WIDTH;
+	for (int i = 0; i < numOfCol; i++) {
+		lvc.pszText = (LPSTR)cols.cols[i].value;
+		lvc.cx = cols.cols[i].size;
+		SendMessage(hwnd, LVM_INSERTCOLUMN, i, (long)&lvc);
+	}
+}
+inline void TableBox_addItem(HWND hwnd, UI_Lvitem item, int numOfCol/*列的数量*/) {
+	LVITEM p1 = { 0 };
+	p1.mask = LVIF_TEXT | LVIF_STATE;
+	p1.state = INDEXTOSTATEIMAGEMASK(1);
+
+	p1.pszText = (LPSTR)item.subItem[0].value;
+
+	SendMessageA(hwnd, LVM_INSERTITEM, 0, (LPARAM)&p1);
+
+	for (int i = 1; i < numOfCol; i++) {
+		p1.iSubItem = i;
+		p1.pszText = (LPSTR)item.subItem[i].value;
+		SendMessageA(hwnd, LVM_SETITEMTEXT, 0, (LPARAM)&p1);
+	}
+}
+inline int TableBox_getIndex(HWND hwnd) {
+	return SendMessageA(hwnd, LVM_GETSELECTIONMARK, 0, 0);
+
+}
+inline void TableBox_clear(HWND hwnd) {
+	SendMessageA(hwnd, LVM_DELETEALLITEMS, 0, 0);
+}
+inline int TableBox_getCount(HWND hwnd) {
+	return SendMessageA(hwnd, LVM_GETITEMCOUNT, 0, 0);
+}
+inline bool TableBox_removeItem(HWND hwnd, int index) {
+	return SendMessageA(hwnd, LVM_DELETEITEM, index, 0);
+}
+inline char* TableBox_getItemText(HWND hwnd, int index, int col) {
+	LPSTR lpstr = NULL;
+	char str[TableBoxMaxSting];
+	ZeroMemory(str, TableBoxMaxSting);
+	ListView_GetItemText(hwnd, index, col, str, TableBoxMaxSting);
+	return (CHAR*)str;
+}
+inline bool TableBox_setItemText(HWND hwnd, int index, int col, const char* str) {
+	LVITEM p1 = { 0 };
+	p1.mask = LVIF_TEXT | LVIF_STATE;
+	p1.state = INDEXTOSTATEIMAGEMASK(1);
+	p1.iSubItem = col;
+	p1.pszText = (LPSTR)str;
+	return SendMessageA(hwnd, LVM_SETITEMTEXT, index, (LPARAM)&p1);
+}
+inline int TableBox_getSelCount(HWND hwnd) {
+	return SendMessageA(hwnd, LVM_GETSELECTEDCOUNT, 0, 0);
+}
+inline bool TableBox_getSelIf(HWND hwnd, int index) {/*判断某项是否被选中*/
+	if (SendMessageA(hwnd, LVM_GETITEMSTATE, index, LVIS_SELECTED))return true;
+	return false;
+}/*判断某项是否被选中*/
+inline void TableBox_clearAll(HWND hwnd) {
+	int nCols = 0;			//ListView列数
+	HWND hWnd, hWndHeader;
+	LVITEM lvItem;
+	hWnd = hwnd;
+	SendMessage(hWnd, LVM_DELETEALLITEMS, 0, 0);
+	hWndHeader = (HWND)SendMessage(hWnd, LVM_GETHEADER, 0, 0);
+	nCols = SendMessage(hWndHeader, HDM_GETITEMCOUNT, 0, 0);
+	while (nCols)
+	{
+		SendMessage(hWnd, LVM_DELETECOLUMN, 0, (LPARAM)&lvItem);
+		nCols--;
+	}
+}
+inline char * TableBox_getColumeText(HWND hwnd, int index) {
+	LVCOLUMN lvc;
+	lvc.mask = LVCF_TEXT;
+	lvc.cchTextMax = TableBoxMaxSting;
+	lvc.iSubItem = index;
+	char str[TableBoxMaxSting];
+	lvc.pszText = str;
+	ListView_GetColumn(hwnd, index, &lvc);
+	return str;
+}
+inline int TableBox_getColCount(HWND hwnd) {
+	HWND hWndHeader = (HWND)SendMessage(hwnd, LVM_GETHEADER, 0, 0);
+	return SendMessage(hWndHeader, HDM_GETITEMCOUNT, 0, 0);
+}
+
+inline HWND createTreeBox(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindowEx(NULL, "SysTreeView32", 0, WS_CHILD | WS_VISIBLE | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline HTREEITEM TreeBox_add(HWND hwnd, HTREEITEM itemParent, const char * str) {
+	tagTVINSERTSTRUCTA tvitem1;
+	tvitem1.hParent = itemParent;
+	tvitem1.hInsertAfter = TVI_ROOT;
+	tvitem1.itemex.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_DI_SETITEM | TVIF_PARAM;
+	tvitem1.itemex.pszText = (LPSTR)str;
+	return TreeView_InsertItem(hwnd, &tvitem1);
+}
+inline HTREEITEM TreeBox_getSelItem(HWND hwnd) {
+	HTREEITEM Selected = TreeView_GetSelection(hwnd);
+	return Selected;
+}
+inline char* TreeBox_getItemText(HWND hwnd, HTREEITEM item) {
+	TVITEM itt;
+	char temp[TableBoxMaxSting];
+	itt.hItem = item;
+	itt.mask = TVIF_TEXT | TVIF_HANDLE;
+	itt.cchTextMax = TableBoxMaxSting;
+	itt.pszText = temp;
+	TreeView_GetItem(hwnd, &itt);
+	return (CHAR*)temp;
+}
+inline void TreeBox_setItemText(HWND hwnd, HTREEITEM item, const char* str) {
+	TVITEM item1;
+	item1.mask = TVIF_TEXT | TVIF_HANDLE;
+	item1.pszText = (LPSTR)str;
+	item1.hItem = item;
+
+	TreeView_SetItem(hwnd, &item1);
+}
+inline bool TreeBox_removeItem(HWND hwnd, HTREEITEM item) {
+	if (item == TVI_ROOT || item == NULL)return false;
+	return SendMessage(hwnd, TVM_DELETEITEM, 0, (LPARAM)item);
+}
+inline bool TreeBox_clear(HWND hwnd) {
+	return SendMessage(hwnd, TVM_DELETEITEM, 0, (LPARAM)NULL);
+}
+
+inline HWND createCheckBox(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("BUTTON", "", BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+	SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline bool CheckBox_getCheckIf(HWND hwnd) {
+	if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_CHECKED)return true;
+	return false;
+}
+inline bool CheckBox_getUncheckIf(HWND hwnd) {
+	if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_UNCHECKED)return true;
+	return false;
+}
+inline bool CheckBox_setCheck(HWND hwnd) {
+	return SendMessage(hwnd, BM_SETCHECK, BST_CHECKED, 0);
+}
+inline bool CheckBox_setUnchecked(HWND hwnd) {
+	return SendMessage(hwnd, BM_SETCHECK, BST_UNCHECKED, 0);
+}
+
+inline HWND createCheckBox3(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindow("BUTTON", "", BS_AUTO3STATE | WS_CHILD | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, NULL, NULL);
+	SendDlgItemMessage(hparent, Handle, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline bool CheckBox3_setIndeterminate(HWND hwnd) {
+	return SendMessage(hwnd, BM_SETCHECK, BST_INDETERMINATE, 0);
+}
+inline bool CheckBox3_getIndeterminateIf(HWND hwnd) {
+	if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_INDETERMINATE)return true;
+	return false;
+}
+inline int CheckBox3_getState(HWND hwnd) {
+	if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_INDETERMINATE)return BST_INDETERMINATE;
+	if (SendMessage(hwnd, BM_GETCHECK, 0, 0) == BST_CHECKED)return BST_CHECKED;
+	return BST_UNCHECKED;
+}
+
+inline HWND createProgressBar(unsigned int Handle, HWND hparent) {
+	HWND hwnd = CreateWindowEx(NULL, "msctls_progress32", 0, WS_CHILD | WS_VISIBLE | WS_BORDER,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, hparent, (HMENU)Handle, GetModuleHandle(NULL), NULL);
+	ShowWindow(hwnd, SW_SHOW);
+	SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+	return hwnd;
+}
+inline bool ProgressBar_setRange(HWND hwnd, int value) {
+	return SendMessage(hwnd, PBM_SETRANGE32, 0, (LPARAM)value);
+}
+inline bool ProgressBar_setPos(HWND hwnd, int value) {
+	return SendMessage(hwnd, PBM_SETPOS, (WPARAM)value, 0);
+}
+inline unsigned int ProgressBar_getPos(HWND hwnd) {
+	return SendMessage(hwnd, PBM_GETPOS, 0, 0);
+}
+inline unsigned int ProgressBar_getHighLimit(HWND hwnd) {
+	return SendMessage(hwnd, PBM_GETRANGE, 0, 0);
+}
+inline unsigned int ProgressBar_getLowLimit(HWND hwnd) {
+	return SendMessage(hwnd, PBM_GETRANGE, 1, 0);
+}
 

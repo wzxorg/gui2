@@ -25,6 +25,9 @@ CheckBox ch1;
 childMenu cm7;
 CheckBox3 ch2;
 childMenu cm8;
+childMenu cm9;
+MDIClient mdi1;
+HINSTANCE mdiHins;
 void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -34,7 +37,7 @@ void wm_paint(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_char(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_keyDown(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 void wm_close(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
-
+void wm_notify(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam);
 
 
 void wm_char(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
@@ -64,6 +67,8 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	m1.addItem(3001, "Change Icon I");
 	m1.addItem(3002, "Reset the icon");
 	m1.addItem(3003, "change image");
+	m1.addItem(3101, "Enable");
+	m1.addItem(3102, "disable");
 
 	cm1.create(top1.h_menu, "ListBox");
 	cm1.addItem(3004, "Add 123");
@@ -106,8 +111,13 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	cm7.addItem(3029, "IndeterminateIF");
 	cm7.addItem(3030, "Indeterminate");
 	cm7.addItem(3031, "getState");
-	
 
+	cm3.addItem(4001, "delete all including col");
+	cm3.addItem(4002, "get colname");
+	cm3.addItem(4003, "get count");
+
+	cm9.create(top1.h_menu, "MDI");
+	cm9.addItem(4004, "create");
 	top1.show(hwnd);
 
 
@@ -121,6 +131,11 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	ch1.setText("123");
 	ch2.create(1007, hwnd);
 	ch2.setText("456");
+
+	
+	mdi1.create(4777, hwnd,all_hins,50000,NULL);
+	
+	
 	//HICON hIcon = LoadIcon(win1.his, MAKEINTRESOURCE(IDI_ICON1));
 	//SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 	//win1.setIcon(MAKEINTRESOURCE(IDI_ICON1));
@@ -128,13 +143,13 @@ void wm_create(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 }
 void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
-	t1.setLocation(0, 0, 100, 50);
+	t1.setLocation(0, 0, 100, 120);
 	b1[0].setLocation(110, 0, 50, 30);
 	b1[1].setLocation(200, 0, 50, 30);
 	b1[2].setLocation(250, 0, 50, 30);
 	b1[3].setLocation(300, 0, 50, 30);
 	b1[5].setLocation(350, 0, 50, 30);
-	l1.setLocation(0, 60, 100, 100);
+	l1.setLocation(0, 120, 100, 40);
 	list1.setLocation(0, 200, 200, 200);
 	b1[4].setLocation(200, 200, 50, 30);
 	ta1.setLocation(300, 60, 250, 150);
@@ -143,12 +158,14 @@ void wm_size(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	ch1.setLocation(300, 450, 250, 20);
 	
 	ch2.setLocation(300, 480, 250, 20);
+	mdi1.setLocation(600, 0, 350, 500);
+	//MoveWindow(mdi1.getHwnd(), 600, 0,350 ,400, TRUE);
 }
 void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 	switch (wParam)
 	{
 		//list an example
-
+	
 	case 2001: {
 		win1.alert(t1.getText(), "");
 		break;
@@ -340,10 +357,51 @@ void wm_command(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 		alert(p, "");
 		break;
 	}
-	default: {
+	case 3101: {
+		EnableWindow(t1.getHwnd(), true);
+		
+		break;
+	}
+	case 3102: {
+		EnableWindow(t1.getHwnd(), false);
 
 		break;
 	}
+	case 4001: {
+		ta1.clearAll();
+		break;
+	}
+	case 4002: {
+		alert(ta1.getColumeText(0), "");
+		alert(ta1.getColumeText(1), "");
+		alert(ta1.getColumeText(2), "");
+		break;
+	}
+	case 4003: {
+		int c = ta1.getColCount();
+		String strC = intTOstr(c);
+		char*p = (char*)strC.data();
+		alert(p, "");
+		
+		break;
+	}
+	case 4004: {
+		mdi1.createChildWindow(all_hins, "childClass1", "Form1");
+		break;
+	}
+	default: {
+		if (LOWORD(wParam) >= 50000) {
+			DefFrameProc(hwnd, mdi1.getHwnd(), Message, wParam, lParam);
+		}
+		else {
+			HWND hChild;
+			hChild = (HWND)SendMessage(mdi1.getHwnd(), WM_MDIGETACTIVE, 0, 0);
+			if (hChild) {
+				SendMessage(hChild, WM_COMMAND, wParam, lParam);
+			}
+		}
+	}
+
 	}
 }
 void wm_rtClick(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
@@ -359,7 +417,106 @@ void wm_paint(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 void wm_close(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
 }
+void wm_notify(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+	/*
+	if ((int)wParam!=1003)return;//10482432
+	if ((int)lParam ==  10482432)return;//19919824
+	if ((int)lParam == 19919824)return;//3732800
+	if ((int)lParam == 3732800)return;//9695280
+	if ((int)lParam == 9695280)return;//11792400
+	if ((int)lParam == 11792400)return;//
+	if ((int)lParam == 12448128)return;//
+	if ((int)lParam == 7336800)return;//
+	if ((int)lParam == 11530912)return;//
+	if ((int)lParam == 13627328)return;//
+	if ((int)lParam == 5239672)return;//
+	if ((int)lParam == 18084168)return;//
+	if ((int)lParam == 17822832)return;//
+	if ((int)lParam == 2093968)return;//
+	if ((int)lParam == 9434584)return;//
+	if ((int)lParam == 17823328)return;//
+	if ((int)lParam == 1700136)return;//
+	if ((int)lParam == 11530008)return;//
+	if ((int)lParam == 5238728)return;//
+	if ((int)lParam == 7336672)return;//
+	if ((int)lParam == 14480792)return;//
+	if ((int)lParam == 14872752)return;//
+	if ((int)lParam == 7336112)return;//
+	if ((int)lParam == 14087560)return;//
+	bool doIt=false;
+	if ((int)lParam == 5500976)doIt = true;
+	//if(doIt == true){
+	String wp = intTOstr(wParam);
+	char* p = (char*)wp.data();
+	//alert(p,"");
+	String lp = intTOstr(lParam);
+	char*p1 = (char*)lp.data();
+	//alert(p1,"");
+	String str;
+	str = t1.getText();
+	str += "\r\n";
+	str += wp;
+	str += "||";
+	str += lp;
+	char* p3 = (char*)str.data();
+	t1.setText(p3);
+	//}
+	*/
+	//
+	NM_LISTVIEW* pnmv = (NM_LISTVIEW FAR *) lParam;
+	if (pnmv->hdr.code == LVN_COLUMNCLICK)t1.setText("1");//点击了列。表头
 
+	if (pnmv->hdr.code == LVN_ITEMACTIVATE)t1.setText("2");//激活列表里的某一项，也就是行，双击鼠标左键。
+
+	if (pnmv->hdr.code == NM_CLICK)t1.setText("3");//单击列表里的某一项，
+				
+}
+
+
+LRESULT CALLBACK MDIChildWndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+	switch (Message) {
+	case WM_CREATE: {
+		char szFileName[MAX_PATH];
+		HWND hEdit,H1;
+		
+		hEdit = CreateWindowEx(/*WS_EX_CLIENTEDGE*/ NULL, "EDIT", "", WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | ES_MULTILINE | ES_WANTRETURN,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			hwnd, (HMENU)1001, NULL/*all_hins*/, NULL);
+
+		SendMessage(hEdit, WM_SETFONT,
+			(WPARAM)GetStockObject(DEFAULT_GUI_FONT), MAKELPARAM(TRUE, 0));
+		
+		H1 = createTextBox("", 1002, hwnd);
+		set_Win_Text(H1 , "123");
+
+		break;
+	}
+	case WM_SIZE:
+		if (wParam != SIZE_MINIMIZED)
+			MoveWindow(GetDlgItem(hwnd, 1001), 0, 0, LOWORD(lParam), HIWORD(lParam)/2, TRUE);
+		setWinLocation(UIgetDlgItem(1002),0, WindowHeight / 2, WindowWidth, WindowHeight / 2);
+		break;
+	case WM_MDIACTIVATE: {
+
+
+		//DrawMenuBar(g_hMainWindow);
+
+		break;
+	}
+	case WM_SETFOCUS:
+		//SetFocus(GetDlgItem(hwnd, 1001));
+		SetFocus(UIgetDlgItem(1001));
+		break;
+	case WM_COMMAND: {
+		switch (LOWORD(wParam)) {
+
+
+		}
+		return 0;
+	}
+	}
+	return DefMDIChildProc(hwnd, Message, wParam, lParam);
+}
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
 
@@ -379,6 +536,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) 
 				  //可选：
 				  //case WM_PAINT: {wm_paint(hwnd, Message, wParam, lParam);break;}
 				  //case WM_CLOSE: {wm_close(hwnd, Message, wParam, lParam);break;}
+				  case WM_NOTIFY: {wm_notify(hwnd, Message, wParam, lParam);break;}
 
 	default:
 		return DefWindowProc(hwnd, Message, wParam, lParam);
@@ -391,11 +549,16 @@ int WINAPI WinMain/* main*/(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR 
 	win1.callback_(WndProc);
 	win1.wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	win1.wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	
+	MdiChildWindowClass wch1;
+	wch1.registerWindowClass(hInstance, MDIChildWndProc, "childClass1");
 
 	all_hins = hInstance;
 	all_lpCmdLine = lpCmdLine;
 	all_nShowCmd = nCmdShow;
 
-	win1.create_wind(800, 600);
+	mdiHins = hInstance;
+
+	win1.create_wind(1000, 600);
 	return 0;
 }
